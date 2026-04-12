@@ -69,7 +69,40 @@ static HAL_StatusTypeDef BMP390_ReadCalib(I2C_HandleTypeDef *hi2c, BMP390_Calib_
 
 }
 
-
+//reference bmp390 datasheet bosch
 HAL_StatusTypeDef BMP390_Init(I2C_HandleTypeDef *hi2c){
+	HAL_StatusTypeDef ret; //ret is a 4 byte int (enum 0,1,2,3), typdef wraps enums for readability
+	uint8_t val;
+
+	//use ret for ID checks
+	ret = I2C_ReadReg(hi2c, BMP390_ADDR, BMP390_CHIP_ID_REG, &val, 1);
+	if (ret != HAL_OK) return ret;
+	if (val != BMP390_CHIP_ID_VAL) return HAL_ERROR;
+
+	//soft reset
+	ret = I2C_WriteReg(hi2c, BMP390_ADR, BMP390_CMD, 0xB6);
+	if (ret != HAL_OK) return ret;
+	HAL_Delay(10);
+
+	//oversampling: pg 37 011 pressure x8
+	ret = I2C_WriteReg(hi2c, BMP390_ADDR, BMP390_OSR, 0x03);
+	if (ret != HAL_OK) return ret;
+
+	//output data rate: 50 Hz pg 38 0x02 for ODR 50Hz and 20 ms sampling period
+	ret = I2C_WriteReg(hi2c, BMP390_ADDR, BMP390_ODR, 0x02);
+	if (ret != HAL_OK) return ret;
+
+	//IIR filter coeff 3 - 010 Register 0x1F
+	ret = I2C_WriteReg(hi2c, BMP390_ADDR, BMP390_CONFIG, 0x02)
+
+	//pg 36 Enable pressure + temperature, normal mode = 110011
+	ret = I2C_WriteReg(hi2c, BMP390_ADDR, BMP390_PWR_CTRL, 0x33);
+	if (ret != HAL_OK) return ret;
+
+	return HAL_OK;
+}
+
+
+static float BMP390_CompensateTemp(uint32_t raw_temp, BMP390_Calib_t *cal){
 
 }

@@ -3,7 +3,7 @@
 #define INC_BMP390_H
 
 #include "i2c.h"
-
+//#define removes magic numbers, which helps clarify typos by returning a compiler error instead of silently compiiling and failing at runtime
 //#define directives create macros that are preprocessor-level instructions replaced by their defeined content BEFORE compilation
 #define BMP390_ADDR		(0x77 << 1) //0111_0111  -> 1110_1110 to 0xEE
 #define BMP390_CHIP_ID_REG	0x00 //0000_0000
