@@ -104,5 +104,8 @@ HAL_StatusTypeDef BMP390_Init(I2C_HandleTypeDef *hi2c){
 
 
 static float BMP390_CompensateTemp(uint32_t raw_temp, BMP390_Calib_t *cal){
-
+	float partial_data1 = (float) raw_temp - cal->par_t1; //calib temp by subtracting dt of chip from zero temp (par_t1) by the raw ADC value
+	float partial_data2 = partial_data1 * cal->par_t2; //calib temp by scaling temp by the gain (par_t2 = degrees per ADC count)
+	cal->t_lin			= partial_data2 + 
 }
+
